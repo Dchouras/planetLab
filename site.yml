@@ -1,0 +1,7 @@
+---
+- hosts: all
+  remote_user: arizona_tools1
+  
+  tasks:
+  - name: copy def.conf
+    copy: src=/home/arizona_tools1/def.conf dest=~/.
