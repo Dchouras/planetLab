@@ -163,6 +163,8 @@ PUPPET_MASTER_PORT="8140"
 
 if __name__ == '__main__':
     print "testing write_slices_file"
+    sys.path.append("/opt/planetstack")
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "planetstack.settings")
     lib = HpcLibrary()
     lib.write_slices_file()
 
