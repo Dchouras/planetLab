@@ -1062,8 +1062,8 @@
     "fields": {
         "router_id": null, 
         "updated": "2013-12-18T22:21:36.462Z", 
-        "name": "test", 
-        "service": null, 
+        "name": "Request Router Slice", 
+        "service": 4, 
         "created": "2013-12-13T21:56:57.299Z", 
         "network_id": null, 
         "tenant_id": "", 
@@ -1074,7 +1074,7 @@
         "subnet_id": null, 
         "slice_url": "", 
         "creator": null, 
-        "description": "Test slice number one."
+        "description": "Request Router Slice."
     }
 },
 {
@@ -46168,6 +46168,12 @@
         "user": 15, 
         "created": "2013-12-17T18:08:58.293Z"
     }
+},
+
+{
+    "pk": 4,
+    "model": "requestrouter.RequestRouterService",
+    "fields": {}
 },
 
 {

@@ -16,9 +16,13 @@ class RequestRouterService(SingletonModel,Service):
     lastResortAction = models.CharField(max_length=30, default = "random", help_text="Review if this should be enum")
     maxAnswers = models.PositiveIntegerField(default=3, help_text="Maximum number of answers in DNS response.")
 
-    def __unicode__(self):  return u'RequestRouterService'
+    def __unicode__(self):  return u'Request Router Service'
 
-class ServiceMap(models.Model):
+class ServiceMap(PlCoreBase):
+
+    class Meta:
+        app_label = "requestrouter"
+
     name = models.SlugField(max_length=50, unique=True, blank=False, null=False, help_text="name of this service map")
     owner = models.ForeignKey(Service, help_text="service which owns this map")
     slice = models.ForeignKey(Slice, help_text="slice that implements this service")
