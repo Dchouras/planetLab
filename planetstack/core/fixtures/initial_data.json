@@ -46177,6 +46177,32 @@
 },
 
 {
+    "pk": 1,
+    "model": "requestrouter.ServiceMap",
+    "fields": {
+        "name": "Service Map 1",
+	"updated": "2013-12-17T18:08:58.293Z",
+	"created": "2013-12-17T18:08:58.293Z",
+        "owner": 4,
+        "slice": 14,
+        "prefix": "abc.edu"
+    }
+},
+
+{
+    "pk": 2,
+    "model": "requestrouter.ServiceMap",
+    "fields": {
+        "name": "Service Map 2",
+        "updated": "2013-12-17T18:08:58.293Z",
+        "created": "2013-12-17T18:08:58.293Z",
+        "owner": 5,
+        "slice": 4,
+        "prefix": "abc1.edu"
+    }
+},
+
+{
     "pk": 5, 
     "model": "syndicate.syndicateservice", 
     "fields": {}
