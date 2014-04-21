@@ -5,8 +5,10 @@ deployment=VICCI
 
 [db]
 name=planetstack
-user=plstackuser
-password=2uMDYtJK
+#user=plstackuser
+#password=2uMDYtJK
+user=postgres
+password=password
 host=localhost
 port=5432
 
