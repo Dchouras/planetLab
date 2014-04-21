@@ -13,7 +13,7 @@ from util.logger import Logger, logging
 parentdir = os.path.join(os.path.dirname(__file__),"..")
 sys.path.insert(0,parentdir)
 
-import rrlib
+#import rrlib
 
 logger = Logger(level=logging.INFO)
 
@@ -25,9 +25,25 @@ class SyncServiceMap(SyncStep):
         SyncStep.__init__(self, **args)
 
     def fetch_pending(self):
-        ret = ServiceMap.objects.filter(Q(enacted__lt=F('updated')) | Q(enacted=None))
-        return ret
+	try:
+        	ret = ServiceMap.objects.filter(Q(enacted__lt=F('updated')) | Q(enacted=None))
+        	return ret
+	except Exception, e:
+        	traceback.print_exc()
+            	return None
 
     def sync_record(self, servicemap):
-        print "sync!"
-        # TODO: finish this
+	try:
+        	print "sync!"
+        	# TODO: finish this
+	except Exception, e:
+                traceback.print_exc()
+                return False
+
+if __name__ == "__main__":
+    sv = SyncServiceMap()
+
+    recs = sv.fetch_pending()
+
+    for rec in recs:
+        sv.sync_record( rec )
