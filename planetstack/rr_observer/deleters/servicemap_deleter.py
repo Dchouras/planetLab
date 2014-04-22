@@ -1,5 +1,6 @@
 import os
 import sys
+import traceback
 from requestrouter.models import ServiceMap
 from observer.deleter import Deleter
 
@@ -13,4 +14,15 @@ class ServiceMapDeleter(Deleter):
             Deleter.__init__(self, **args)
 
         def call(self, pk, model_dict):
-            print "XXX delete ServiceMap", model_dict
+	    try:
+                map_name = model_dict['name']
+		print "XXX delete ServiceMap %s", map_name 
+                return True
+            except Exception, e:
+                traceback.print_exc()
+                logger.exception("Failed to erase map '%s'" % map_name)
+                return False
+
+if __name__ == "__main__":
+	smap = ServiceMapDeleter()
+    	smap.call( 6, {'name': 'Service23'} )
