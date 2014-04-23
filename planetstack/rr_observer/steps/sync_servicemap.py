@@ -38,6 +38,7 @@ class SyncServiceMap(SyncStep, RequestRouterLibrary):
 	try:
 		print "sync! %s " % self.get_servicemap_uid(servicemap)
 		self.gen_dnsredir_serviceconf(servicemap)
+		self.gen_dnsdemux_serviceconf(servicemap)
         	# TODO: finish this
 	except Exception, e:
                 traceback.print_exc()

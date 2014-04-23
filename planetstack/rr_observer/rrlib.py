@@ -65,7 +65,7 @@ class RequestRouterLibrary:
 
 		#generate dnsredir.conf file 
 
-		fn = "./temp_config/"+objname+".conf"
+		fn = "./temp_config/dnsredir/"+objname+".conf"
 		f = open(fn, "w")
 		f.write("""
 [dnsredir]
@@ -133,11 +133,34 @@ HttpRequestPort=80
 
 		#generate configdirectory
 		
-		os.mkdir("./temp_config/"+objname+".d")
+		os.mkdir("./temp_config/dnsredir/"+objname+".d")
 		
 		#geenrate codeen_nodes.conf
-		fn = "./temp_config/"+objname+".d/codeen_nodes.conf"
+		fn = "./temp_config/dnsredir/"+objname+".d/codeen_nodes.conf"
                 f = open(fn, "w")
 		f.write("test data \n")
 
 
+
+	def gen_dnsdemux_serviceconf(self, servicemap):
+			'''
+			generates frontend service*.conf file for each of the service
+			It assumes that there is a dnsdemux frontend running on the RR istallation and will
+			just add a conf file for each service in /etc/dnsdemux/default/backends.d 
+			'''
+			objname = self.get_servicemap_uid(servicemap)
+
+			#generate dnsdemux.conf file parameters to be used in static file.
+			mapping = {}
+			mapping["port_listen"] = self.get_service_port(servicemap)
+			mapping["domain_name"] = servicemap.prefix	
+
+			#generate service specifc .conf file
+
+			fn = "./temp_config/dnsdemux/"+objname+".conf"
+			f = open(fn, "w")
+			f.write("""
+Forward 127.0.0.1  %(port_listen)s %(domain_name)s 
+""" % mapping)
+
+			
