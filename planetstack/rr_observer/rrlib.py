@@ -9,13 +9,19 @@ if __name__ == '__main__':
 
 from planetstack.config import Config
 from core.models import Service
-from requestrouter.models import RequestRouterService
+from requestrouter.models import RequestRouterService, ServiceMap
 from util.logger import Logger, logging
+import rrlib_config
 
 logger = Logger(level=logging.INFO)
 
+'''
+Conventions:
+1) All dnsredir backend will listen at port 9000+ servicemap.pk ( where pk is the primary key generated in django model)
+'''
+
 class RequestRouterLibrary:
-	
+
 	def __init__(self):
 		pass
 	
@@ -35,4 +41,103 @@ class RequestRouterLibrary:
             		name = slice.name
             		for sliver in slice.slivers.all():
 	    			f.write("%s\n" % sliver.node.name)
-	
+
+
+	def get_servicemap_uid(self, servicemap):
+		seq = ("service_", str(servicemap.pk));
+		return "".join(seq)
+
+	def get_service_port(self, servicemap):
+                return str(9000+servicemap.pk)
+
+	def gen_dnsredir_serviceconf(self, servicemap):
+		objname = self.get_servicemap_uid(servicemap)
+		
+		#generate dnsredir.conf file parameters to be used in static file.
+		mapping = {}
+		mapping["port_listen"] = self.get_service_port(servicemap)
+		mapping["configdir"] = rrlib_config.DNSREDIR_CONFIGDIR_PREFIX+objname+".d"
+		mapping["domain_name"] = rrlib_config.TBD;
+		mapping["logdir"] = rrlib_config.DNSREDIR_LOGDIR_PREFIX+objname+".d"
+		mapping["pidfile"] = rrlib_config.DNSREDIR_PIDFILE_PREFIX+objname+".pid"
+		mapping["domain_name"] = servicemap.prefix		
+		mapping["name_server"] = rrlib_config.TBD
+
+		#generate dnsredir.conf file 
+
+		fn = "./temp_config/"+objname+".conf"
+		f = open(fn, "w")
+		f.write("""
+[dnsredir]
+
+# specify a name server for the domain name
+#
+%(domain_name)s NS %(name_server)s <IP> <TTL>
+# Default TTL for an A record lookup (default: 30)
+#
+Default_TTL=30
+
+# maps a domain name to a static IP
+#
+Static %(domain_name)s <IP> <TTL>
+
+# port on which the agent receives HTTP heartbeats
+#
+HTTPPort=80
+
+# Port on which to receive commands
+#
+CommandPort=3000
+
+# file containing HTTP request
+#
+HTTPReq=<file>
+
+# file containing HTTP response
+#
+HTTPResp=<file>
+
+# port on which to listen
+#
+Port=%(port_listen)s
+
+# configuration directory (default: /etc/dnsredir/config/)
+#
+ConfigDir=%(configdir)s
+
+# directory in which to create log files (default: ./log)
+#
+LogDir=%(logdir)s
+
+# file in which to store PID. Note that in a deployed system /etc/init.d/dnsredir assumes the pid file has the form /var/run/dnsredir.*.pid, and will not work correctly if this assumption is not true.
+#
+Pidfile=%(pidfile)s
+
+# amount to increment the load on a node when it is returned as the egress node. In Kbps. (default: 4000)
+#
+LoadIncr=4000
+
+# the maximum number of answers (egress nodes) to be returned. (default: 3)
+#
+MaxAnswers=3
+
+# directory containing the redirection maps. If dir is relative (doesn't start with '/') it is relative to configDir.
+#
+MapsDir=mapsd
+
+# port on which HTTP requests are received (default: 80)
+#
+HttpRequestPort=80
+
+""" % mapping)
+
+		#generate configdirectory
+		
+		os.mkdir("./temp_config/"+objname+".d")
+		
+		#geenrate codeen_nodes.conf
+		fn = "./temp_config/"+objname+".d/codeen_nodes.conf"
+                f = open(fn, "w")
+		f.write("test data \n")
+
+

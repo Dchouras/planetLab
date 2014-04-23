@@ -3,6 +3,7 @@
 import os
 import sys
 import base64
+import traceback
 from django.db.models import F, Q
 from planetstack.config import Config
 from observer.syncstep import SyncStep
@@ -13,16 +14,17 @@ from util.logger import Logger, logging
 parentdir = os.path.join(os.path.dirname(__file__),"..")
 sys.path.insert(0,parentdir)
 
-#import rrlib
+from rrlib import RequestRouterLibrary
 
 logger = Logger(level=logging.INFO)
 
-class SyncServiceMap(SyncStep):
+class SyncServiceMap(SyncStep, RequestRouterLibrary):
     provides=[ServiceMap]
     requested_interval=0
 
     def __init__(self, **args):
         SyncStep.__init__(self, **args)
+	RequestRouterLibrary.__init__(self)
 
     def fetch_pending(self):
 	try:
@@ -34,7 +36,8 @@ class SyncServiceMap(SyncStep):
 
     def sync_record(self, servicemap):
 	try:
-        	print "sync!"
+		print "sync! %s " % self.get_servicemap_uid(servicemap)
+		self.gen_dnsredir_serviceconf(servicemap)
         	# TODO: finish this
 	except Exception, e:
                 traceback.print_exc()
