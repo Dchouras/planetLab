@@ -34,7 +34,7 @@ class RequestRouterLibrary:
 			service = RequestRouterService.objects.get()
 
 
-		fn = "./slices"
+		fn = "/etc/ansible/requestrouter/hosts"
 		f = open(fn, "w")
 
         	for slice in service.service.all():

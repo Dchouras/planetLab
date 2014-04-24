@@ -1,0 +1,19 @@
+---
+# This playbook contains plays to copy configurations to destination
+- name: copy dnsredir config directory
+  copy: src={{src_dnsredir}}/{{name}}.d dest={{dst_dnsredir_confdir}}
+
+- name: copy dnsredir config file
+  copy: src={{src_dnsredir}}/{{name}}.conf dest={{dst_dnsredir_conf}}/{{name}}.conf
+  #notify: restart dnsredir
+
+#- name: Start the dnsredir service
+  #service: name=dnsredir state=started enabled=true
+
+- name: copy dnsdemux config files
+  copy: src={{src_dnsdemux}}/{{name}}.conf dest={{dst_dnsdemux_conf}}/{{name}}.conf
+  #notify: restart dnsdemux
+
+#- name: Start the dnsdemux service
+  #service: name=dnsdemux state=started enabled=true
+

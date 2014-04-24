@@ -1,0 +1,6 @@
+---
+- name: restart dnsredir
+  service: name=dnsredir state=restarted
+
+- name: restart dnsdemux
+  service: name=dnsdemux state=restarted
