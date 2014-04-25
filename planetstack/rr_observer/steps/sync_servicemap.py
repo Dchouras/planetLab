@@ -15,16 +15,18 @@ parentdir = os.path.join(os.path.dirname(__file__),"..")
 sys.path.insert(0,parentdir)
 
 from rrlib import RequestRouterLibrary
+from configurationPush import ConfigurationPush
 
 logger = Logger(level=logging.INFO)
 
-class SyncServiceMap(SyncStep, RequestRouterLibrary):
+class SyncServiceMap(SyncStep, RequestRouterLibrary, ConfigurationPush):
     provides=[ServiceMap]
     requested_interval=0
 
     def __init__(self, **args):
         SyncStep.__init__(self, **args)
 	RequestRouterLibrary.__init__(self)
+	ConfigurationPush.__init__(self)
 
     def fetch_pending(self):
 	try:
@@ -39,7 +41,9 @@ class SyncServiceMap(SyncStep, RequestRouterLibrary):
 		print "sync! %s " % self.get_servicemap_uid(servicemap)
 		self.gen_dnsredir_serviceconf(servicemap)
 		self.gen_dnsdemux_serviceconf(servicemap)
-        	# TODO: finish this
+        	# push generated files from temp_config
+		service_uid = self.get_servicemap_uid(servicemap)
+		self.config_push(service_uid)
 	except Exception, e:
                 traceback.print_exc()
                 return False

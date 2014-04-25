@@ -2,7 +2,7 @@ import os
 import base64
 import string
 import sys
-from sets import Set
+
 if __name__ == '__main__':
     sys.path.append("/opt/planetstack")
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "planetstack.settings")
@@ -41,27 +41,6 @@ class RequestRouterLibrary:
 
 		return mapping
 
-	def gen_servicemap_slice_info(self, servicemap):
-                """generates sliver information from slice of servicemap
-                """
-
-		wzone = Set(['arizona', 'stanford', 'on.lab', 'housten']) # zone=1 in cooden.conf
-		ezone = Set(['princeton', 'atlanta', 'new york', 'georgia tech']) # zone=2 in coodeen.conf
-
-                mapping_zone = {}
-		mapping_ip = {}
-		slice = servicemap.slice
-                name = slice.name
-                for sliver in slice.slivers.all():
-			mapping_ip[sliver.name] = str(sliver.ip)
-			site = sliver.node.site.name
-			if(site.lower() in wzone):
-				mapping_zone[sliver.name] = str(1)
-			else:
-				mapping_zone[sliver.name] = str(2)
-
-                return mapping_ip, mapping_zone
-
 
 	def gen_slice_file(self, service):
                 """ generates host file for the slice information
@@ -93,9 +72,11 @@ class RequestRouterLibrary:
 		mapping = {}
 		mapping["port_listen"] = self.get_service_port(servicemap)
 		mapping["configdir"] = rrlib_config.DNSREDIR_CONFIGDIR_PREFIX+objname+".d"
+		mapping["domain_name"] = rrlib_config.TBD;
 		mapping["logdir"] = rrlib_config.DNSREDIR_LOGDIR_PREFIX+objname+".d"
 		mapping["pidfile"] = rrlib_config.DNSREDIR_PIDFILE_PREFIX+objname+".pid"
 		mapping["domain_name"] = servicemap.prefix		
+		mapping["name_server"] = rrlib_config.TBD
 
 		#generate dnsredir.conf file 
 
@@ -106,15 +87,30 @@ class RequestRouterLibrary:
 
 # specify a name server for the domain name
 #
-""")
-		for (k,v) in rr_mapping.items():
-                        f.write(mapping["domain_name"]+" NS "+k+" "+v+" 86400 \n" % mapping)
-
-
-		f.write("""
+%(domain_name)s NS %(name_server)s <IP> <TTL>
 # Default TTL for an A record lookup (default: 30)
 #
 Default_TTL=30
+
+# maps a domain name to a static IP
+#
+Static %(domain_name)s <IP> <TTL>
+
+# port on which the agent receives HTTP heartbeats
+#
+HTTPPort=80
+
+# Port on which to receive commands
+#
+CommandPort=3000
+
+# file containing HTTP request
+#
+HTTPReq=<file>
+
+# file containing HTTP response
+#
+HTTPResp=<file>
 
 # port on which to listen
 #
@@ -127,6 +123,18 @@ ConfigDir=%(configdir)s
 # directory in which to create log files (default: ./log)
 #
 LogDir=%(logdir)s
+
+# file in which to store PID. Note that in a deployed system /etc/init.d/dnsredir assumes the pid file has the form /var/run/dnsredir.*.pid, and will not work correctly if this assumption is not true.
+#
+Pidfile=%(pidfile)s
+
+# amount to increment the load on a node when it is returned as the egress node. In Kbps. (default: 4000)
+#
+LoadIncr=4000
+
+# the maximum number of answers (egress nodes) to be returned. (default: 3)
+#
+MaxAnswers=3
 
 # directory containing the redirection maps. If dir is relative (doesn't start with '/') it is relative to configDir.
 #
@@ -143,45 +151,30 @@ HttpRequestPort=80
 		os.mkdir("./temp_config/dnsredir/"+objname+".d")
 		
 		#geenrate codeen_nodes.conf
-		mapping_ip, mapping_zone = self.gen_servicemap_slice_info(servicemap)
+		fn = "./temp_config/dnsredir/"+objname+".d/codeen_nodes.conf"
+                f = open(fn, "w")
+		f.write("test data \n")
 
-		codeen_name = "./temp_config/dnsredir/"+objname+".d/codeen_nodes.conf"
-                f = open(codeen_name, "w")
-		for (k,v) in mapping_zone.items():
-                        f.write(k+" zone="+v+" \n")
-
-		iptxt = "./temp_config/dnsredir/"+objname+".d/node-to-ip.txt"
-		f = open(iptxt, "w")
-		for (k,v) in mapping_ip.items():
-			f.write(k+" "+v+" \n")
-
-		#generate maps directory
-		os.mkdir("./temp_config/dnsredir/"+objname+".d/mapsd")
-
-		# redirection map
-		map = "./temp_config/dnsredir/"+objname+".d/mapsd/map.conf"
-		f = open(map, "w")
-		f.write("prefix "+servicemap.prefix+" \n")
-		f.write("map 1.2.3.4/24 zone 1 || zone 2 \n")
-		f.write("map 1.2.3.4/24 zone 2 || zone 1 \n")
 
 
 	def gen_dnsdemux_serviceconf(self, servicemap):
-		'''
-		generates frontend service*.conf file for each of the service
-		It assumes that there is a dnsdemux frontend running on the RR istallation and will
-		just add a conf file for each service in /etc/dnsdemux/default/backends.d 
-		'''
-		objname = self.get_servicemap_uid(servicemap)
-		#generate dnsdemux.conf file parameters to be used in static file.
-		mapping = {}
-		mapping["port_listen"] = self.get_service_port(servicemap)
-		mapping["domain_name"] = servicemap.prefix	
-		#generate service specifc .conf file
+			'''
+			generates frontend service*.conf file for each of the service
+			It assumes that there is a dnsdemux frontend running on the RR istallation and will
+			just add a conf file for each service in /etc/dnsdemux/default/backends.d 
+			'''
+			objname = self.get_servicemap_uid(servicemap)
 
-		fn = "./temp_config/dnsdemux/"+objname+".conf"
-		f = open(fn, "w")
-		f.write("""
+			#generate dnsdemux.conf file parameters to be used in static file.
+			mapping = {}
+			mapping["port_listen"] = self.get_service_port(servicemap)
+			mapping["domain_name"] = servicemap.prefix	
+
+			#generate service specifc .conf file
+
+			fn = "./temp_config/dnsdemux/"+objname+".conf"
+			f = open(fn, "w")
+			f.write("""
 Forward 127.0.0.1  %(port_listen)s %(domain_name)s 
 """ % mapping)
 
