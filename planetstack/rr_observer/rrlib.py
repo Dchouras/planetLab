@@ -185,4 +185,12 @@ HttpRequestPort=80
 Forward 127.0.0.1  %(port_listen)s %(domain_name)s 
 """ % mapping)
 
-			
+	
+	def teardown_temp_configfiles(self, objname):
+		os.remove("./temp_config/dnsdemux/"+objname+".conf")
+		os.remove("./temp_config/dnsredir/"+objname+".d/mapsd/map.conf")
+		os.rmdir("./temp_config/dnsredir/"+objname+".d/mapsd")
+		os.remove("./temp_config/dnsredir/"+objname+".d/node-to-ip.txt")
+		os.remove("./temp_config/dnsredir/"+objname+".d/codeen_nodes.conf")
+		os.rmdir("./temp_config/dnsredir/"+objname+".d")
+		os.remove("./temp_config/dnsredir/"+objname+".conf")

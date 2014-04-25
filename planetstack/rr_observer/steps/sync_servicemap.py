@@ -44,6 +44,7 @@ class SyncServiceMap(SyncStep, RequestRouterLibrary, ConfigurationPush):
         	# push generated files from temp_config
 		service_uid = self.get_servicemap_uid(servicemap)
 		self.config_push(service_uid)
+		self.teardown_temp_configfiles(service_uid)
 	except Exception, e:
                 traceback.print_exc()
                 return False
