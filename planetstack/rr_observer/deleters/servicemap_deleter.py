@@ -15,8 +15,8 @@ class ServiceMapDeleter(Deleter):
 
         def call(self, pk, model_dict):
 	    try:
-                map_name = model_dict['name']
-		print "XXX delete ServiceMap %s", map_name 
+                servicemap = ServiceMap.objects.get(pk=pk)
+		print "XXX delete ServiceMap %s", servicemap.name
                 return True
             except Exception, e:
                 traceback.print_exc()

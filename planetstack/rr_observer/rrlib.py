@@ -177,7 +177,7 @@ HttpRequestPort=80
 		mapping = {}
 		mapping["port_listen"] = self.get_service_port(servicemap)
 		mapping["domain_name"] = servicemap.prefix	
-		#generate service specifc .conf file
+		#generate service speciiiifc .conf file
 
 		fn = "./temp_config/dnsdemux/"+objname+".conf"
 		f = open(fn, "w")
@@ -187,10 +187,18 @@ Forward 127.0.0.1  %(port_listen)s %(domain_name)s
 
 	
 	def teardown_temp_configfiles(self, objname):
-		os.remove("./temp_config/dnsdemux/"+objname+".conf")
-		os.remove("./temp_config/dnsredir/"+objname+".d/mapsd/map.conf")
-		os.rmdir("./temp_config/dnsredir/"+objname+".d/mapsd")
-		os.remove("./temp_config/dnsredir/"+objname+".d/node-to-ip.txt")
-		os.remove("./temp_config/dnsredir/"+objname+".d/codeen_nodes.conf")
-		os.rmdir("./temp_config/dnsredir/"+objname+".d")
-		os.remove("./temp_config/dnsredir/"+objname+".conf")
+		if os.path.exists("./temp_config/dnsdemux/"+objname+".conf"):
+			os.remove("./temp_config/dnsdemux/"+objname+".conf")
+		if os.path.exists("./temp_config/dnsredir/"+objname+".d/mapsd/map.conf"):
+			os.remove("./temp_config/dnsredir/"+objname+".d/mapsd/map.conf")
+		if os.path.exists("./temp_config/dnsredir/"+objname+".d/mapsd"):
+			os.rmdir("./temp_config/dnsredir/"+objname+".d/mapsd")
+		if os.path.exists("./temp_config/dnsredir/"+objname+".d/node-to-ip.txt"):
+			os.remove("./temp_config/dnsredir/"+objname+".d/node-to-ip.txt")
+		if os.path.exists("./temp_config/dnsredir/"+objname+".d/codeen_nodes.conf"):
+			os.remove("./temp_config/dnsredir/"+objname+".d/codeen_nodes.conf")
+		if os.path.exists("./temp_config/dnsredir/"+objname+".d"):
+			os.rmdir("./temp_config/dnsredir/"+objname+".d")
+		if os.path.exists("./temp_config/dnsredir/"+objname+".conf"):
+			os.remove("./temp_config/dnsredir/"+objname+".conf")
+
